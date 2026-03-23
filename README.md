@@ -46,12 +46,12 @@ bash -
 git clone https://github.com/yourusername/ai-decision-copilot.git
 cd ai-decision-copilot
 
-Run Setup: 
+## ⚙️ Run Setup: 
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-TO RUN THE APP 
+## 💣 TO RUN THE APP 
 PYTHONPATH=. streamlit run demo/streamlit_app.py
 
 
