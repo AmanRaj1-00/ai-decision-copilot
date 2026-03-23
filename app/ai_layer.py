@@ -1,18 +1,30 @@
+import ollama
+
+
 def generate_ai_explanation(decision):
     """
-    Simulated AI explanation (no API needed)
+    Generate AI-based business explanation using Llama3
     """
 
-    region = decision["action"].split()[-1]
+    prompt = f"""
+You are a business analyst.
 
-    explanation = f"""
-Revenue decline in {region} suggests potential drop in customer demand or market competition.
+Given:
+Action: {decision['action']}
+Reason: {decision['reason']}
 
-Strategic suggestion:
-Focus on targeted promotions and customer engagement campaigns in {region}.
+Provide:
+1. Why this might be happening
+2. One strategic suggestion
+3. One potential risk
 
-Risk:
-Increased marketing spend may not immediately convert to revenue if underlying demand is weak.
+Keep it concise.
 """
 
-    return explanation.strip()
+    response = ollama.chat(
+        model="llama3",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["message"]["content"]
+
