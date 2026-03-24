@@ -6,6 +6,7 @@ from app.etl import clean_sales, aggregate_monthly
 from app.signals import detect_revenue_drop
 from app.decision_engine import generate_decisions
 from app.ai_layer import generate_ai_explanation
+from app.data_adapter import adapt_dataset
 
 # ======================
 # PAGE CONFIG
@@ -53,7 +54,8 @@ uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
 
 if uploaded_file:
 
-    df = pd.read_csv(uploaded_file, parse_dates=["date"])
+    df = pd.read_csv(uploaded_file)
+    df = adapt_dataset(df)   
     df_clean = clean_sales(df)
     monthly = aggregate_monthly(df_clean)
 
