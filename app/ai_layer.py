@@ -1,30 +1,18 @@
-import ollama
-
-
 def generate_ai_explanation(decision):
-    """
-    Generate AI-based business explanation using Llama3
-    """
+    try:
+        import ollama
 
-    prompt = f"""
-You are a business analyst.
+        prompt = f"""
+        Action: {decision['action']}
+        Reason: {decision['reason']}
+        """
 
-Given:
-Action: {decision['action']}
-Reason: {decision['reason']}
+        response = ollama.chat(
+            model="llama3",
+            messages=[{"role": "user", "content": prompt}]
+        )
 
-Provide:
-1. Why this might be happening
-2. One strategic suggestion
-3. One potential risk
+        return response["message"]["content"]
 
-Keep it concise.
-"""
-
-    response = ollama.chat(
-        model="llama3",
-        messages=[{"role": "user", "content": prompt}]
-    )
-
-    return response["message"]["content"]
-
+    except:
+        return "AI insight unavailable (requires Ollama setup)"

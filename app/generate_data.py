@@ -52,4 +52,4 @@ if __name__ == "__main__":
     df = generate_sales_data()
     os.makedirs("data/raw", exist_ok=True)
     df.to_csv("data/raw/sales.csv", index=False)
-    print("✅ Sales data generated successfully!")
+    print("Sales data generated successfully!")
