@@ -3,40 +3,48 @@ import pandas as pd
 def adapt_dataset(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
-    # Normalize column names
-    df.columns = [col.lower().strip() for col in df.columns]
+    # Normalize column names (stronger)
+    df.columns = [col.lower().strip().replace("_", " ") for col in df.columns]
 
-    # Mapping dictionary
-    column_map = {
-        "date": ["date", "order date", "timestamp"],
-        "revenue": ["revenue", "sales", "amount"],
-        "profit": ["profit", "margin"],
-        "region": ["region", "country", "location"],
-        "units_sold": ["units", "quantity", "qty"]
-    }
+    # Helper function for flexible matching
+    def find_column(possible_names):
+        for col in df.columns:
+            for name in possible_names:
+                if name in col:
+                    return col
+        return None
 
-    mapped = {}
+    # Detect columns
+    date_col = find_column(["date", "order"])
+    revenue_col = find_column(["revenue", "sales", "amount"])
+    profit_col = find_column(["profit", "margin"])
+    region_col = find_column(["region", "country", "location"])
+    units_col = find_column(["units", "quantity", "qty"])
 
-    for target, options in column_map.items():
-        for opt in options:
-            if opt in df.columns:
-                mapped[target] = opt
-                break
+    # Validate required columns
+    if not date_col:
+        raise ValueError(f"No date column detected. Found columns: {df.columns.tolist()}")
 
-    # Rename detected columns
-    df = df.rename(columns={v: k for k, v in mapped.items()})
+    if not revenue_col:
+        raise ValueError(f"No revenue/sales column detected. Found columns: {df.columns.tolist()}")
 
-    # Handle missing required columns
-    if "date" not in df:
-        raise ValueError("No date column detected")
+    # Rename
+    df = df.rename(columns={
+        date_col: "date",
+        revenue_col: "revenue"
+    })
 
-    if "revenue" not in df:
-        raise ValueError("No revenue/sales column detected")
+    if profit_col:
+        df = df.rename(columns={profit_col: "profit"})
+    if region_col:
+        df = df.rename(columns={region_col: "region"})
+    if units_col:
+        df = df.rename(columns={units_col: "units_sold"})
 
     # Convert date
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
 
-    # Add missing fields
+    # Fill missing
     if "region" not in df:
         df["region"] = "Unknown"
 

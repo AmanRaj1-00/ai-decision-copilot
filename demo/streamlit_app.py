@@ -47,6 +47,13 @@ threshold = st.sidebar.slider(
     value=0.1
 )
 
+model_choice = st.sidebar.selectbox(
+    "AI Mode",
+    ["local (fast)", "cloud (better)"]
+)
+
+model_mode = "cloud" if "cloud" in model_choice else "local"
+
 # ======================
 # FILE UPLOAD
 # ======================
@@ -55,7 +62,7 @@ uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
 if uploaded_file:
 
     df = pd.read_csv(uploaded_file)
-    df = adapt_dataset(df)   
+    df = adapt_dataset(df)
     df_clean = clean_sales(df)
     monthly = aggregate_monthly(df_clean)
 
@@ -139,7 +146,7 @@ if uploaded_file:
                     st.success("Decision accepted")
 
                 with st.spinner("Generating AI insight..."):
-                    ai_text = generate_ai_explanation(d)
+                    ai_text = generate_ai_explanation(d, model_mode)
 
                 st.markdown(f"""
                 <div class="ai-box">
@@ -171,8 +178,10 @@ if uploaded_file:
             {user_question}
             """
 
+            model = "kimi-k2.5:cloud" if model_mode == "cloud" else "qwen2.5-coder:7b"
+
             response = ollama.chat(
-                model="llama3",
+                model=model,
                 messages=[{"role": "user", "content": prompt}]
             )
 
@@ -198,8 +207,10 @@ if uploaded_file:
             what business impact can we expect?
             """
 
+            model = "kimi-k2.5:cloud" if model_mode == "cloud" else "qwen2.5-coder:7b"
+
             response = ollama.chat(
-                model="llama3",
+                model=model,
                 messages=[{"role": "user", "content": prompt}]
             )
 
